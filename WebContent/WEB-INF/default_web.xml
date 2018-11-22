@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>Activity Report Services</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>RawActivity</servlet-name>
+    <servlet-class>RawActivity</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RawActivity</servlet-name>
+    <url-pattern>/RawActivity</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ActivitySummary</servlet-name>
+    <servlet-class>ActivitySummary</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ActivitySummary</servlet-name>
+    <url-pattern>/ActivitySummary</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>FixTracking</servlet-name>
+    <servlet-class>FixTracking</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FixTracking</servlet-name>
+    <url-pattern>/FixTracking</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>GetSequences</servlet-name>
+    <servlet-class>GetSequences</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetSequences</servlet-name>
+    <url-pattern>/GetSequences</url-pattern>
+  </servlet-mapping>  
+</web-app>

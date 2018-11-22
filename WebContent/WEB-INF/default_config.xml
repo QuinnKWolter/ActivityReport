@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<um2_dbstring>jdbc:default</um2_dbstring>
+	<um2_dbuser>default</um2_dbuser>
+	<um2_dbpass>default</um2_dbpass>
+	<aggregate_dbstring>jdbc:default</aggregate_dbstring>
+	<aggregate_dbuser>default</aggregate_dbuser>
+	<aggregate_dbpass>default</aggregate_dbpass>
+	<delimiter>,</delimiter>
+</configuration>

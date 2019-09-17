@@ -1,5 +1,3 @@
-//http://localhost:8080/ActivityReport/ActivitySummary?usr=lmo17,tjg49,peterb&grp=IS172013Fall&header=yes
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -20,24 +18,6 @@ public class ActivitySummary extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	public static DecimalFormat df = new DecimalFormat("#.##");
-
-	//public static String mg_grps = RawActivity.mg_grps;
-	// "CSC1310_G1, CSC1310_G2, IS17Fall20141,IS17Fall20141,"
-	// + "IS1022Fall2014, IS2710Fall20141,IS2710Fall20142,"
-	// +
-	// "ASUFALL2014, IS10222014Sprg, IS172014Spring, BENG11_TAZ_2014, BENG12_TAZ_2014,"
-	// +
-	// "WSSU_JAVAF2013, WSSU_JAVAF2013B, IS172013Fall, IS10222013Fall, IS27102013Fall,"
-	// + "MIS333_2014_1,STUDY2013_A,STUDY2013_B,STUDY2013_C";
-
-	//public static String progressor_grps = RawActivity.progressor_grps;
-	// "IS172013Spring,IS172012Fall,IS172012Spring,"
-	// + "IS172011Fall,IS172011Spring"; // mapped to progressor_plus
-
-	//public static String progressor_grps_map = RawActivity.progressor_grps_map;// "progressor_plus";
-
-	//public static ArrayList<String> non_students = RawActivity.non_students;
-	//public static ArrayList<String> non_sessions = RawActivity.non_sessions;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -77,13 +57,6 @@ public class ActivitySummary extends HttpServlet {
 			userIds = users.split("\\s*[,\t]+\\s*");
 		String header = request.getParameter("header"); // include or not the header
 		boolean incHeader = (header != null && header.equalsIgnoreCase("yes"));
-		//String surfix = request.getParameter("surfix"); // include or not the header
-		// String removeUsers = request.getParameter("removeUsr"); // group id
-		// String[] remove = null;
-		// if (removeUsers != null) {
-		// remove = removeUsers.split("\\s*[,\t]+\\s*");
-		// non_students.addAll(Arrays.asList(remove));
-		// }
 
 		String fromDate = request.getParameter("fromDate");
 		String toDate = request.getParameter("toDate");
@@ -115,8 +88,6 @@ public class ActivitySummary extends HttpServlet {
 		}
 		
 		
-//		boolean replaceExtTimes = (request.getParameter("replaceexttimes") != null);
-
 		boolean sessionate = (request.getParameter("sessionate") != null);
 		int minThreshold = 90;
 		if(sessionate) minThreshold = 90;
@@ -146,9 +117,6 @@ public class ActivitySummary extends HttpServlet {
 				GroupActivity groupActivity = new GroupActivity(groupId, topicSource,
 						non_students, Common.non_sessions, true, cm, dateRange, queryArchive, sessionate, minThreshold, timeBins);
 				
-//				Labeller labeller = new Labeller(groupActivity,new String[]{"short","long"});
-//				labeller.labelTime(replaceExtTimes);
-
 				String delimiter = cm.delimiter;
 				if (incHeader) {
 					outputBuilder.append("user" + delimiter + "group" + delimiter + "sessions_dist"
@@ -197,6 +165,9 @@ public class ActivitySummary extends HttpServlet {
 							+ delimiter + "pcrs_success_first_attempt" + delimiter + "pcrs_success_second_attempt"
 							+ delimiter + "pcrs_success_third_attempt"
 							+ delimiter);
+					
+					outputBuilder.append("sqltutor_attempts" + delimiter + "sqltutor_attempts_success" 
+							+ delimiter + "sqltutor_dist" + delimiter + "sqltutor_dist_success" + delimiter);
 					
 					outputBuilder.append("pcex_completed_set" + delimiter + "pcex_ex_dist_seen" + delimiter + "pcex_ch_attempts" + delimiter + "pcex_ch_attempts_success" 
 							+ delimiter + "pcex_ch_dist" + delimiter + "pcex_ch_success" 
@@ -255,6 +226,7 @@ public class ActivitySummary extends HttpServlet {
 							+ "pcrs_durationseconds_first_attempt" + delimiter
 							+ "pcrs_durationseconds_second_attempt" + delimiter
 							+ "pcrs_durationseconds_third_attempt" + delimiter
+							+ "sqltutor_durationseconds" + delimiter
 							+ "pcex_example_durationseconds" + delimiter
 							+ "pcex_example_durationseconds_median" + delimiter
 							+ "pcex_example_lines_durationseconds" + delimiter
@@ -404,6 +376,10 @@ public class ActivitySummary extends HttpServlet {
 									+ user.summary.get("pcrs_success_first_attempt") + delimiter
 									+ user.summary.get("pcrs_success_second_attempt") + delimiter
 									+ user.summary.get("pcrs_success_third_attempt") + delimiter
+									+ user.summary.get("sqltutor_attempts") + delimiter
+									+ user.summary.get("sqltutor_attempts_success") + delimiter
+									+ user.summary.get("sqltutor_dist") + delimiter
+									+ user.summary.get("sqltutor_dist_success") + delimiter
 									+ user.summary.get("pcex_completed_set") + delimiter
 									+ user.summary.get("pcex_ex_dist_seen") + delimiter
 									+ user.summary.get("pcex_ch_attempts") + delimiter
@@ -472,6 +448,7 @@ public class ActivitySummary extends HttpServlet {
 									+ user.summary.get("durationseconds_pcrs_first_attempt") + delimiter
 									+ user.summary.get("durationseconds_pcrs_second_attempt") + delimiter
 									+ user.summary.get("durationseconds_pcrs_third_attempt") + delimiter
+									+ user.summary.get("durationseconds_sqltutor") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex_median") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex_lines") + delimiter

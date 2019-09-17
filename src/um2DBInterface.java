@@ -1,10 +1,8 @@
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,7 +93,7 @@ public class um2DBInterface extends dbInterface {
 				// for QUIZJET (25) activityName (question) the sub parameter in
 				// AllParameters. activityParent does not exist
 				// 37 SALT, 38 parsons, 39 socialreader, 40 educvideos, 41 quizpet, 44 PCRS
-				if (appId == 3 || appId == 25 || appId == 35 || appId == 8 || appId == 23 
+				if (appId == 3 || appId == 25 || appId == 35 || appId == 8 || appId == 23 || appId == 19
 						|| appId == 37 || appId == 38 || appId == 39 || appId == 40 || appId == 41 || appId == 44 || appId == 46 || appId == 47) {
 					String[] all_params = allParameters.split(";");
 					if (all_params != null) {
@@ -212,6 +210,16 @@ public class um2DBInterface extends dbInterface {
 										if (value.contains("Template")) {
 											parentName = value;
 											activityName = parentName;
+										}
+										break;
+									case 19: //SQL-Tutor
+										activityName = value;
+										
+										if (topic_map != null && topic_map.containsKey(value)){
+											Activity a = topic_map.get(value);
+											actOrderInCourse = a.getOrderInCourse();
+											topicOrderInCourse = a.getTopicOrderInCourse();
+											topicName = a.getFirstTopic();
 										}
 										break;
 									case 8: // KT has the activity in the act
@@ -361,9 +369,7 @@ public class um2DBInterface extends dbInterface {
 			currentUser.addLoggedActivity(act);
 		}
 		
-		
 		this.releaseStatement(stmt, rs);
-		
 	}
 
 	private void addPcexTrackingActivities(HashMap<String, User> result, String grp,
@@ -455,100 +461,6 @@ public class um2DBInterface extends dbInterface {
 		}
 
 	}
-
-	// returns the activity of the user in content of type example
-	// TODO animated examples support @@@@
-//	public HashMap<String, String[]> getUserExamplesActivity(String usr) {
-//		try {
-//			HashMap<String, String[]> res = new HashMap<String, String[]>();
-//			stmt = conn.createStatement();
-//			String query = "select A.activity, "
-//					+ "AA.parentactivityid, count(UA.activityid) as nactions,  "
-//					+ "count(distinct(UA.activityid)) as distinctactions, "
-//					+ "(select count(AA2.childactivityid) from rel_activity_activity AA2 where AA2.parentactivityid = AA.parentactivityid) as totallines "
-//					+ "from archive_user_activity UA, rel_activity_activity AA, ent_activity A "
-//					+ " where (UA.appid=3 OR UA.appid=35) and UA.userid = (select userid from ent_user where login='"
-//					+ usr
-//					+ "') "
-//					+ " and AA.parentactivityid=A.activityid and AA.childactivityid=UA.activityid "
-//					+ "group by AA.parentactivityid " + "order by AA.parentactivityid;";
-//			// System.out.println(query);
-//			rs = stmt.executeQuery(query);
-//			// System.out.println(query);
-//
-//			boolean noactivity = true;
-//			while (rs.next()) {
-//				noactivity = false;
-//				String[] act = new String[4];
-//				act[0] = rs.getString("activity");
-//				act[1] = rs.getString("nactions");
-//				act[2] = rs.getString("distinctactions");
-//				act[3] = rs.getString("totallines");
-//				res.put(act[0], act);
-//				// System.out.println(act[0]+" actions: "+act[2]+", "+act[3]+"/"+act[4]);
-//			}
-//			this.releaseStatement(stmt, rs);
-//			if (noactivity)
-//				return null;
-//			else
-//				return res;
-//		}
-//		catch (SQLException ex) {
-//			System.out.println("SQLException: " + ex.getMessage());
-//			System.out.println("SQLState: " + ex.getSQLState());
-//			System.out.println("VendorError: " + ex.getErrorCode());
-//			return null;
-//		}
-//		finally {
-//			this.releaseStatement(stmt, rs);
-//		}
-//
-//	}
-
-//	public HashMap<String, String[]> getUserQuestionsActivity(String usr) {
-//		try {
-//			HashMap<String, String[]> res = new HashMap<String, String[]>();
-//			stmt = conn.createStatement();
-//			String query = "(select AC.activity, count(UA.activityid) as nattempts,  sum(UA.Result) as nsuccess from um2.archive_user_activity UA, um2.ent_activity AC where UA.appid=25 and UA.userid = (select userid from um2.ent_user where login='"
-//					+ usr
-//					+ "') and AC.activityid=UA.activityid and UA.Result != -1 group by UA.activityid) \n";
-//			query += " UNION ALL \n";
-//			query += "(select QN.content_name as activity, count(UA.activityid) as nattempts,  sum(UA.Result) as nsuccess "
-//					+ " from um2.archive_user_activity UA, um2.sql_question_names QN where UA.appid=23 and "
-//					+ " UA.userid = (select userid from um2.ent_user where login='"
-//					+ usr
-//					+ "') and "
-//					+ " QN.activityid=UA.activityid and UA.Result != -1  "
-//					+ " group by UA.activityid); ";
-//
-//			// System.out.println(query);
-//			rs = stmt.executeQuery(query);
-//			boolean noactivity = true;
-//			while (rs.next()) {
-//				noactivity = false;
-//				String[] act = new String[3];
-//				act[0] = rs.getString("activity");
-//				act[1] = rs.getString("nattempts");
-//				act[2] = rs.getString("nsuccess");
-//				if (act[0].length() > 0)
-//					res.put(act[0], act);
-//			}
-//			this.releaseStatement(stmt, rs);
-//			if (noactivity)
-//				return null;
-//			else
-//				return res;
-//		}
-//		catch (SQLException ex) {
-//			System.out.println("SQLException: " + ex.getMessage());
-//			System.out.println("SQLState: " + ex.getSQLState());
-//			System.out.println("VendorError: " + ex.getErrorCode());
-//			return null;
-//		}
-//		finally {
-//			this.releaseStatement(stmt, rs);
-//		}
-//	}
 
 	public ArrayList<String[]> getClassList(String grp) {
 

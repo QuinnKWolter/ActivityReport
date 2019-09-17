@@ -19,6 +19,7 @@ public class Common {
 	public static final int WEBEX 				= 3;
 	public static final int KNOWLEDGE_SEA 		= 5;
 	public static final int KT 					= 8;
+	public static final int SQLTUTOR			= 19;
 	public static final int QUIZGUIDE 			= 20;
 	public static final int SQLKNOT 			= 23;
 	public static final int QUIZJET 			= 25;
@@ -33,8 +34,8 @@ public class Common {
 	
 	public static boolean isContent(int appId){
 		return appId == Common.QUIZJET || appId == Common.QUIZPET || appId == Common.PARSONS || appId == Common.QUIZPACK || 
-				appId == Common.SQLKNOT || appId == Common.WEBEX || appId == Common.ANIMATED_EXAMPLE || appId == LESSLET ||
-				appId == PCRS || appId == PCEX_EXAMPLE || appId == PCEX_CHALLENGE; 
+				appId == Common.SQLKNOT ||appId == Common.SQLTUTOR || appId == Common.WEBEX || appId == Common.ANIMATED_EXAMPLE || 
+				appId == LESSLET || appId == PCRS || appId == PCEX_EXAMPLE || appId == PCEX_CHALLENGE; 
 				
 	}
 
@@ -75,6 +76,7 @@ public class Common {
 		APP_MAP.put(3, "WEBEX");
 		APP_MAP.put(5, "KNOWLEDGE_SEA");
 		APP_MAP.put(8, "KT");
+		APP_MAP.put(19, "SQLTUTOR");
 		APP_MAP.put(20, "QUIZGUIDE");
 		APP_MAP.put(23, "SQLKNOT");
 		APP_MAP.put(25, "QUIZJET");

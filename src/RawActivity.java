@@ -1,13 +1,5 @@
-//http://localhost:8080/ActivityReport/RawActivity?grp=IS172013Fall&header=yes
-//MG:http://adapt2.sis.pitt.edu/ActivityReport/RawActivity?header=yes&svc=no&grp=CSC1310_G1,CSC1310_G2,IS17Fall20141,IS17Fall20141,IS1022Fall2014,IS2710Fall20141,IS2710Fall20142,ASUFALL2014,IS10222014Sprg,IS172014Spring,BENG11_TAZ_2014,BENG12_TAZ_2014,WSSU_JAVAF2013,WSSU_JAVAF2013B,IS172013Fall,IS10222013Fall,IS27102013Fall,MIS333_2014_1,STUDY2013_A,STUDY2013_B,STUDY2013_C
-//PG:http://adapt2.sis.pitt.edu/ActivityReport/RawActivity?header=yes&svc=no&grp=IS172013Spring,IS172012Fall,IS172012Spring,IS172011Fall,IS172011Spring,IS172010Fall
-//MG+PG: http://adapt2.sis.pitt.edu/ActivityReport/RawActivity?header=yes&svc=no&grp=CSC1310_G1,CSC1310_G2,IS17Fall20141,IS17Fall20141,IS1022Fall2014,IS2710Fall20141,IS2710Fall20142,ASUFALL2014,IS10222014Sprg,IS172014Spring,BENG11_TAZ_2014,BENG12_TAZ_2014,WSSU_JAVAF2013,WSSU_JAVAF2013B,IS172013Fall,IS10222013Fall,IS27102013Fall,MIS333_2014_1,STUDY2013_A,STUDY2013_B,STUDY2013_C,IS172013Spring,IS172012Fall,IS172012Spring,IS172011Fall,IS172011Spring,IS172010Fall
-//problemastic PG group: http://localhost:8080/ActivityReport/RawActivity?header=yes&svc=no&grp=IS172011Spring
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,7 +16,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-//import java.text.SimpleDateFormat;
 
 /**
  * Servlet implementation class ActivityReport
@@ -33,68 +24,6 @@ import org.codehaus.jettison.json.JSONObject;
 public class RawActivity extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-//	public static DecimalFormat df = new DecimalFormat("#.##");
-
-//	public static String mg_grps = "CSC1310_G1, CSC1310_G2, IS17Fall20141,IS17Fall20141,"
-//			+ "IS1022Fall2014, IS2710Fall20141,IS2710Fall20142,"
-//			+ "ASUFALL2014, IS10222014Sprg, IS172014Spring, BENG11_TAZ_2014, BENG12_TAZ_2014,"
-//			+ "WSSU_JAVAF2013, WSSU_JAVAF2013B, IS172013Fall, IS10222013Fall, IS27102013Fall,"
-//			+ "MIS333_2014_1,STUDY2013_A,STUDY2013_B,STUDY2013_C"; // 21
-//
-//	public static String progressor_grps = "IS172013Spring,IS172012Fall,IS172012Spring,"
-//			+ "IS172011Fall,IS172011Spring,IS172010Fall"; // 6 groups, mapped to
-//																										// progressor_plus
-//
-//	public static String progressor_grps_map = "progressor_plus";
-//
-//	// Caution: the later query also remove people from admin group (GroupId = 68)
-//	public static ArrayList<String> non_students = new ArrayList<String>(
-//			Arrays.asList("anonymous_user", "fedor.bakalov", "nkresl", "maccloud",
-//					"moeslein", "mliang", "pjcst19", "fseels", "r.hosseini", "ltaylor",
-//					"peterb", "shoha99", "jennifer", "dguerra"));
-//
-//	// Caution: in the latter Query also exclude those containing TEST(test) in
-//	// the String
-//	public static ArrayList<String> non_sessions = new ArrayList<String>(
-//			Arrays.asList("null", "undefined", "xxx", "aaaaa", "bbbbb", "fffff",
-//					"XXXX", "xxxx", "XXXXX", "xxxxx", "xxxyyy", "YYYYY", "YYYY"));
-//
-//	public static HashMap<Integer, String> APP_MAP;
-//	static {
-//		APP_MAP = new HashMap<Integer, String>();
-//		APP_MAP.put(2, "QUIZPACK");
-//		APP_MAP.put(3, "WEBEX");
-//		APP_MAP.put(5, "KNOWLEDGE_SEA");
-//		APP_MAP.put(8, "KT");
-//		APP_MAP.put(20, "QUIZGUIDE");
-//		APP_MAP.put(23, "SQLKNOT");
-//		APP_MAP.put(25, "QUIZJET");
-//		APP_MAP.put(35, "ANIMATED_EXAMPLE");
-//		APP_MAP.put(-1, "MASTERY_GRIDS");
-//	}
-//	public static HashMap<String, Integer> MG_ACTIVITYID_MAP;
-//	static {
-//		MG_ACTIVITYID_MAP = new HashMap<String, Integer>();
-//		MG_ACTIVITYID_MAP.put("", 990000001);
-//		MG_ACTIVITYID_MAP.put("app-start", 990000002);
-//		MG_ACTIVITYID_MAP.put("data-load-start", 990000003);
-//		MG_ACTIVITYID_MAP.put("data-load-end", 990000004);
-//		MG_ACTIVITYID_MAP.put("app-ready", 990000005);
-//		MG_ACTIVITYID_MAP.put("group-set", 990000006);
-//		MG_ACTIVITYID_MAP.put("grid-activity-cell-select", 990000007);
-//		MG_ACTIVITYID_MAP.put("activity-open", 990000008);
-//		MG_ACTIVITYID_MAP.put("activity-reload", 990000009);
-//		MG_ACTIVITYID_MAP.put("activity-done", 990000010);
-//		MG_ACTIVITYID_MAP.put("activity-close", 990000011);
-//		MG_ACTIVITYID_MAP.put("activity-load-recommended", 990000012);
-//		MG_ACTIVITYID_MAP.put("activity-load-original", 990000013);
-//		MG_ACTIVITYID_MAP.put("load-others-list", 990000014);
-//		MG_ACTIVITYID_MAP.put("resource-set", 990000015);
-//		MG_ACTIVITYID_MAP.put("activity-feedback-set-difficulty", 990000016);
-//		MG_ACTIVITYID_MAP.put("grid-topic-cell-select", 990000017); // cell-topic-id
-//		MG_ACTIVITYID_MAP.put("comparison-mode-set", 990000018);
-//
-//	}
 
 	/**
 	 * @see HttpServlet#HttpServlet()

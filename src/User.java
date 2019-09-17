@@ -536,6 +536,8 @@ public class User {
 		Set<String> success_lesslet = new HashSet<String>();
 		Set<String> pcrs = new HashSet<String>();
 		Set<String> success_pcrs = new HashSet<String>();
+		Set<String> sqltutor = new HashSet<String>();
+		Set<String> success_sqltutor = new HashSet<String>();
 		Map<Integer,AtomicInteger> pcrsCorrectAttemptMap = new HashMap<Integer, AtomicInteger>();
 		Set<String> pcex_ex = new HashSet<String>();
 		Set<String> pcex_ch = new HashSet<String>();
@@ -558,6 +560,7 @@ public class User {
 		time_summary.put("pcrs_first_attempt", 0.0);
 		time_summary.put("pcrs_second_attempt", 0.0);
 		time_summary.put("pcrs_third_attempt", 0.0);
+		time_summary.put("sqltutor", 0.0);
 		time_summary.put("pcex_ex", 0.0);
 		time_summary.put("pcex_ex_lines", 0.0);
 		time_summary.put("pcex_ch", 0.0);
@@ -599,6 +602,8 @@ public class User {
 		int lesslet_examples_seen = 0;
 		int pcrs_attempts = 0;
 		int pcrs_correct_attempts = 0;
+		int sqltutor_attempts = 0;
+		int sqltutor_correct_attempts = 0;
 		int pcex_ch_attempts = 0;
 		int pcex_ch_correct_attempts = 0;
 		long pcex_completed_set = pcexChallengeCompletionMap.values().stream().filter(PCEXChallengeSetProgress::isSetCompleted).distinct().count();
@@ -699,7 +704,47 @@ public class User {
 					});
 				}
 				sessionActivity.addParson(a.getParentName());
-			} else if(a.getAppId() == Common.LESSLET){
+			} else if(a.getAppId() == Common.SQLTUTOR){
+				System.out.println(a.getParentName());
+				
+				sqltutor.add(a.getActivityName());
+				sqltutor_attempts++;
+				time_summary.put("sqltutor", time_summary.get("sqltutor") + a.getTime());
+				
+				if (a.getResult() == 1) {
+					topics.add(a.getTopicName());
+					success_sqltutor.add(a.getActivityName());
+					sqltutor_correct_attempts++;
+				}
+				sessionActivity.addParson(a.getActivityName());
+				
+//				if (a.getResult() == 1) {
+//					topics.add(a.getTopicName());
+//					parson_topics.add(a.getTopicName());
+//					success_parsons.add(a.getParentName());
+//					parsons_correct_attempts++;
+//					
+//					AtomicInteger counter = parsonsCorrectAttemptMap.getOrDefault(a.getAttemptNo(), new AtomicInteger());
+//					counter.incrementAndGet();
+//					parsonsCorrectAttemptMap.putIfAbsent(a.getAttemptNo(), counter);
+//					
+//					
+//					parsonsTopicCorrectAttemptMap.putIfAbsent(a.getTopicOrder(), new HashMap<Integer,AtomicInteger>());
+//					parsonsTopicCorrectAttemptMap.compute(a.getTopicOrder(), (key, value) -> {
+//						value.putIfAbsent(a.getAttemptNo(), new AtomicInteger());
+//						value.compute(a.getAttemptNo(), (key2, value2) -> {
+//							value2.incrementAndGet();
+//							return value2;
+//						});
+//						
+//						return value;
+//					});
+//				}
+//				sessionActivity.addParson(a.getParentName());
+			} 
+			
+			
+			else if(a.getAppId() == Common.LESSLET){
 				lesslet.add(a.getParentName());
 				if(a.getTime() > max_lesslet_time) {
 					max_lesslet_time = a.getTime();
@@ -756,6 +801,7 @@ public class User {
 				if(a.getLogType() == LogType.UM) { //Line clicks registered to UM
 					time_summary.put("pcex_ex_lines",time_summary.get("pcex_ex_lines") + a.getTime());
 					example_lines++;
+					sessionActivity.addExample(a.getParentName());
 				} else { //Retrieved from PCEX database
 					time_summary.put("pcex_ex",time_summary.get("pcex_ex") + a.getTime());
 					
@@ -771,7 +817,6 @@ public class User {
 					}
 				
 				}
-				sessionActivity.addExample(a.getParentName());
 			} else if(a.getAppId() == Common.PCEX_CHALLENGE){ //PCEX challenge
 				pcex_ch.add(a.getParentName());
 				time_summary.put("pcex_ch",time_summary.get("pcex_ch") + a.getTime());
@@ -780,6 +825,7 @@ public class User {
 				//Actual attempts are stored in UM and in another table of PCEX database. So, should not increase the number of attempts.
 				if(a.getLogType() == LogType.UM) { 
 					pcex_ch_attempts++;
+					sessionActivity.addChallenge(a.getParentName());
 				} else if(a.getLogType() == LogType.PCEX_CONTROL) {//Calculate the time spend with explanations shown or hidden
 					//The only field to pass this information is the SVC parameter. Sorry!
 					boolean explanationShown = Integer.parseInt(a.getSvc()) == 1;
@@ -828,8 +874,6 @@ public class User {
 						break;
 					}
 				}
-				
-				sessionActivity.addChallenge(a.getParentName());
 			} else if (a.getAppId() == Common.WEBEX) {//Webex
 				examples.add(a.getParentName());
 				if(a.getTime() > max_webex_time) {
@@ -969,6 +1013,10 @@ public class User {
 		double medianSessionAct = computeMedianOfSession(sessions,true);
 		double medianSessionTime = computeMedianOfSession(sessions,false);
 		
+		if(userLogin.equals("pene")) {
+			System.out.println();
+		}
+		
 		double medianSessionSelfAssesment = computeMedianOfSessionSelfAssesment(sessions);
 		double medianSessionExamples = computeMedianOfSessionExampleLines(sessions);
 		
@@ -1034,6 +1082,11 @@ public class User {
 		summary.put("pcrs_success_second_attempt",  (double) pcrsCorrectAttemptMap.getOrDefault(2, new AtomicInteger()).get());
 		summary.put("pcrs_success_third_attempt",  (double) pcrsCorrectAttemptMap.getOrDefault(3, new AtomicInteger()).get());
 		
+		summary.put("sqltutor_attempts",  (double) sqltutor_attempts);
+		summary.put("sqltutor_attempts_success",  (double) sqltutor_correct_attempts);
+		summary.put("sqltutor_dist",  (double) sqltutor.size());
+		summary.put("sqltutor_dist_success",  (double) success_sqltutor.size());
+		
 		summary.put("pcex_completed_set", (double) pcex_completed_set);
 		summary.put("pcex_ex_dist_seen", (double) pcex_ex.size());
 		summary.put("pcex_ch_attempts",  (double) pcex_ch_attempts);
@@ -1070,6 +1123,7 @@ public class User {
 		summary.put("durationseconds_pcrs_first_attempt", time_summary.get("pcrs_first_attempt"));
 		summary.put("durationseconds_pcrs_second_attempt", time_summary.get("pcrs_second_attempt"));
 		summary.put("durationseconds_pcrs_third_attempt", time_summary.get("pcrs_third_attempt"));
+		summary.put("durationseconds_sqltutor", time_summary.get("sqltutor"));
 		summary.put("durationseconds_pcex_ex", time_summary.get("pcex_ex"));
 		summary.put("durationseconds_pcex_ex_median", exampleMedian);
 		summary.put("durationseconds_pcex_ex_lines", time_summary.get("pcex_ex_lines"));

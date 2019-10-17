@@ -73,7 +73,7 @@ public class RawActivity extends HttpServlet {
 		try{minThreshold = Integer.parseInt(request.getParameter("minthreshold"));}catch(Exception e){minThreshold = 90;}
 		
 		List<String> excludedAppIds = new ArrayList<String>();
-		String excludeApp = request.getParameter("excludeApp"); // group id
+		String excludeApp = request.getParameter("excludeApp");
 		if (excludeApp != null)
 			excludedAppIds = Arrays.asList(excludeApp.split("\\s*[,\t]+\\s*"));
 		
@@ -82,7 +82,7 @@ public class RawActivity extends HttpServlet {
 		String jsonOutput = request.getParameter("jsonOutput");
 		boolean isJsonOutput = (jsonOutput != null && jsonOutput.equalsIgnoreCase("yes"));
 		
-		String removeUsers = request.getParameter("removeUsr"); // group id
+		String removeUsers = request.getParameter("removeUsr");
 		String[] remove = null;
 		if (removeUsers != null) {
 			remove = removeUsers.split("\\s*[,\t]+\\s*");

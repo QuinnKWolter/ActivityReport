@@ -91,10 +91,4 @@ public class SessionActivity {
 		
 		return example;
 	}
-	
-	
-	
-	public int countDistAct(){
-		return questions.size() + parsons.size() + examples.size() + animations.size();
-	}
 }

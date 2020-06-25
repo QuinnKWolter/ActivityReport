@@ -7,13 +7,14 @@ public class Activity {
 	private int orderInCourse;
 	private int orderInTopic;
 	private int topicOrderInCourse;
-	
-	public Activity(String name, String topic, String provider, int orderInCourse, int orderInTopic, int topicOrderInCourse){
+
+	public Activity(String name, String topic, String provider, int orderInCourse, int orderInTopic,
+			int topicOrderInCourse) {
 		activityName = name;
 		topics = new ArrayList<String>();
 		topics.add(topic);
 		providerId = provider;
-		this.orderInCourse = orderInCourse; 
+		this.orderInCourse = orderInCourse;
 		this.orderInTopic = orderInTopic;
 		this.topicOrderInCourse = topicOrderInCourse;
 	}
@@ -65,12 +66,12 @@ public class Activity {
 	public void setTopicOrderInCourse(int topicOrderInCourse) {
 		this.topicOrderInCourse = topicOrderInCourse;
 	}
-	
-	public String getFirstTopic(){
-		if(topics != null&& topics.size()>0) return topics.get(0);
-		else return "unknown";
+
+	public String getFirstTopic() {
+		if (topics != null && topics.size() > 0)
+			return topics.get(0);
+		else
+			return "unknown";
 	}
-	
-	
 
 }

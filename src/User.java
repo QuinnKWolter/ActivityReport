@@ -618,7 +618,7 @@ public class User {
 		double max_lesslet_time = 0;
 		double max_sql_knot_time = 0;
 		double max_sql_lab_time = 0;
-		
+	
 		for (LoggedActivity a : activity) {
 			//System.out.println("~~~~~~ "+a.getTopicName() +"  "+a.getResult());
 			if(sessions.get(a.getSession()) == null){
@@ -716,7 +716,7 @@ public class User {
 					success_sqltutor.add(a.getActivityName());
 					sqltutor_correct_attempts++;
 				}
-				sessionActivity.addParson(a.getActivityName());
+				sessionActivity.addQuestion(a.getActivityName());
 				
 //				if (a.getResult() == 1) {
 //					topics.add(a.getTopicName());

@@ -42,4 +42,29 @@
     <servlet-name>GetSequences</servlet-name>
     <url-pattern>/GetSequences</url-pattern>
   </servlet-mapping>  
+  
+  <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>SecuredActivityReport</web-resource-name>
+         <url-pattern>/ActivitySummary</url-pattern>
+         <url-pattern>/RawActivity</url-pattern>
+         <http-method>GET</http-method>
+         <http-method>POST</http-method>
+      </web-resource-collection>
+      
+      <auth-constraint>
+         <description>
+            Let only manager-gui use this app
+         </description>
+         <role-name>manager-gui</role-name>
+      </auth-constraint>
+   </security-constraint>
+   
+   <security-role>
+      <role-name>manager-gui</role-name>
+   </security-role>
+   
+   <login-config>
+      <auth-method>BASIC</auth-method>
+   </login-config>
 </web-app>

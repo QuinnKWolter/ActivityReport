@@ -49,7 +49,7 @@ public class GetSequences extends HttpServlet {
 			userIds = users.split("\\s*[,\t]+\\s*");
 		
 		String fileName = request.getParameter("filename");
-		if (fileName == null) fileName = groupId + "_sequences.txt";
+		if (fileName == null) fileName = groupId.replaceAll(",", "_") + "_" + "_sequences.txt";
 		
 		String header = request.getParameter("header"); // include or not the header
 		boolean incHeader = (header != null && header.equalsIgnoreCase("yes"));

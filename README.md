@@ -6,6 +6,7 @@ Here are the list of services provided by ActivityReport.
 
 1. [RawActivity](#rawactivity-service)
 2. [ActivitySummary](#activitysummary-service)
+3. [DataShop]
 3. [GetSequences](#getsequences-service)(not actively maintained)
 4. [FixTracking](#fixtracking-service)(not actively maintained)
 

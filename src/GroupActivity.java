@@ -51,8 +51,6 @@ public class GroupActivity {
 	 * 
 	 * @param grp
 	 *          the group mnemonic
-	 * @param topicSource DEPRECATED
-	 *          MG (mastery grids) or PR (progressor)
 	 * @param non_students
 	 *          a list of students ids to omit
 	 * @param non_sessions
@@ -66,12 +64,12 @@ public class GroupActivity {
 	 *          upper bounds for the activity retrieved
 	 */
 	
-	public GroupActivity(String grp, String topicSource,
+	public GroupActivity(String grp,
 			ArrayList<String> non_students, ArrayList<String> non_sessions,
 			boolean getSummary, ConfigManager cm, String[] dateRange, boolean queryArchive){
-		this(grp, topicSource, non_students, non_sessions, getSummary, cm, dateRange, queryArchive, false, 0, null);
+		this(grp, non_students, non_sessions, getSummary, cm, dateRange, queryArchive, false, 0, null);
 	}
-	public GroupActivity(String grp, String topicSource,
+	public GroupActivity(String grp,
 			ArrayList<String> non_students, ArrayList<String> non_sessions,
 			boolean getSummary, ConfigManager cm, String[] dateRange, boolean queryArchive,
 			boolean resetSessions, int sessionMinThreshold, long timeBins[]) {

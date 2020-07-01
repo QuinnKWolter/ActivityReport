@@ -79,8 +79,16 @@ public class RawActivity extends HttpServlet {
 		
 		ArrayList<String> non_students = new ArrayList<String>(Common.non_students);
 		
-		String jsonOutput = request.getParameter("jsonOutput");
-		boolean isJsonOutput = (jsonOutput != null && jsonOutput.equalsIgnoreCase("yes"));
+		String outputModeStr = request.getParameter("outputMode");
+		RawActivityOutputMode outputMode = RawActivityOutputMode.CSV;
+		
+		if(outputModeStr != null) {
+			if(outputModeStr.equals("json")) {
+				outputMode = RawActivityOutputMode.JSON;
+			} else if(outputModeStr.equals("datashop")) {
+				outputMode = RawActivityOutputMode.DATASHOP;
+			}
+		}
 		
 		String removeUsers = request.getParameter("removeUsr");
 		String[] remove = null;
@@ -89,6 +97,10 @@ public class RawActivity extends HttpServlet {
 			non_students.addAll(Arrays.asList(remove));
 		}
 		String delimiter = request.getParameter("delimiter");
+		if (delimiter == null || delimiter.equals("")) {
+			delimiter = cm.delimiter;
+		}
+			
 		String allparameters = request.getParameter("allparameters");
 		boolean incallparameters = (allparameters != null && allparameters
 				.equalsIgnoreCase("yes"));
@@ -118,30 +130,12 @@ public class RawActivity extends HttpServlet {
 			errorMsg = "group identifier not provided or invalid";
 		}
 		else {
-			// if (groupIds == null) {
-			// groupIds = new String[1];
-			// groupIds[0] = groupId;
-			// }
-			boolean printedHeader = false;
-			JSONObject rawActivityJSON = new JSONObject();
-			JSONArray groupsJSONArray = new JSONArray();
-			StringBuilder outputBuilder = new StringBuilder();
+			List<GroupActivity> groupActivityList = new ArrayList<GroupActivity>();
 						
 			for (String group : groupIds) {
-				JSONObject groupJSON = new JSONObject();
-				JSONArray groupActivityJSONArray = new JSONArray();
-				
-				String topicSource = "UNKNOWN";
-				if (Common.mg_grps.contains(group))
-					topicSource = "MG";
-				else if (Common.progressor_grps.contains(group))
-					topicSource = "PR";
-
-				GroupActivity groupActivity = new GroupActivity(group, topicSource,
+				GroupActivity groupActivity = new GroupActivity(group,
 						non_students, Common.non_sessions, false, cm, dateRange, queryArchive, sessionate, minThreshold, null);
-				if (delimiter == null || delimiter.equals(""))
-					delimiter = cm.delimiter;
-				// @@@@
+				
 				if (incTimeLabel){
 					String[] labels = timeLabels.split(","); 
 					if(labels == null || labels.length<2) {
@@ -149,38 +143,43 @@ public class RawActivity extends HttpServlet {
 					}
 					Labeller labeller = new Labeller(groupActivity,labels);
 					labeller.labelTime(replaceExtTimes);
-					//groupActivity.labelTime(labels);
 				}
+					
+				groupActivityList.add(groupActivity);
+			}
+			
+			JSONObject rawActivityJSON = new JSONObject();
+			JSONArray groupsJSONArray = new JSONArray();
+			StringBuilder outputBuilder = new StringBuilder();
+			
+			if (incHeader) {
+				outputBuilder.append("user" + delimiter + "group" + delimiter + "session" + delimiter + "timebin" + delimiter)
+							 .append("appid" + delimiter + "applabel" + delimiter)
+							 .append("activityname" + delimiter + "targetname" + delimiter
+										+ "parentname" + delimiter + "topicname" + delimiter 
+										+ "courseorder" + delimiter + "topicorder" + delimiter 
+										+ "attemptno" + delimiter + "result" + delimiter)
+							 .append("datestring" + delimiter + "unixtimestamp" + delimiter + "durationseconds")
+							 .append((incTimeLabel ? delimiter + "timelabel" : ""))
+							 .append((incsvc ? delimiter + "svc" : "") + (incallparameters ? delimiter + "allparameters" : "") + "\n");
+			}
+			
+			for(GroupActivity groupActivity:groupActivityList) {
+				JSONObject groupJSON = new JSONObject();
+				JSONArray groupActivityJSONArray = new JSONArray();
+				String group = groupActivity.getGroupId();
 				
-				if (incHeader && !printedHeader) {
-					printedHeader = true;
-					outputBuilder.append("user" + delimiter + "group" + delimiter + "session" + delimiter + "timebin" + delimiter)
-								 .append("appid" + delimiter + "applabel" + delimiter)
-								 .append("activityname" + delimiter + "targetname" + delimiter
-											+ "parentname" + delimiter + "topicname" + delimiter 
-											+ "courseorder" + delimiter + "topicorder" + delimiter 
-											+ "attemptno" + delimiter + "result" + delimiter)
-								 .append("datestring" + delimiter + "unixtimestamp" + delimiter + "durationseconds")
-								 .append((incTimeLabel ? delimiter + "timelabel" : ""))
-								 .append((incsvc ? delimiter + "svc" : "") + (incallparameters ? delimiter + "allparameters" : "") + "\n");
-				}
-
 				if (!groupActivity.isThereActivity()) {
 					error = true;
 					outputBuilder.append("no activity found");
-				}
-				else {
-					String userName = "";
-					String session = "";
+				} else {
 					HashMap<String, User> grp_activity = groupActivity.getGrpActivity();
 					for (Map.Entry<String, User> entry : grp_activity.entrySet()) {
 						User user = entry.getValue();
-						userName = user.getUserLogin();
 						
 						for (LoggedActivity a : user.getActivity()) {
 							if(excludedAppIds.contains(Integer.toString(a.getAppId())) == false) {
-								// System.out.println(userName + "," + a.getAllParameters());
-								outputBuilder.append(userName + delimiter + group + delimiter
+								outputBuilder.append(user.getUserLogin() + delimiter + group + delimiter
 										+ a.getSession() + delimiter + a.getSessionActNo()
 										+ delimiter);
 								outputBuilder.append(a.getAppId() + delimiter + a.getLabel() + delimiter);
@@ -199,7 +198,7 @@ public class RawActivity extends HttpServlet {
 								
 								JSONObject studentJSON = new JSONObject();
 								try {
-									studentJSON.put("user", userName);
+									studentJSON.put("user", user.getUserLogin());
 									studentJSON.put("group", group);
 									studentJSON.put("session", a.getSession());
 									studentJSON.put("timebin", a.getSessionActNo());
@@ -234,6 +233,7 @@ public class RawActivity extends HttpServlet {
 						}
 					}
 				}
+				
 				try {
 					groupJSON.put(group, groupActivityJSONArray);
 				} catch (JSONException e) {
@@ -245,10 +245,12 @@ public class RawActivity extends HttpServlet {
 			try {
 				rawActivityJSON.put("groups", groupsJSONArray);
 				
-				if(isJsonOutput) {
+				if(outputMode == RawActivityOutputMode.JSON) {
 					out.print(rawActivityJSON.toString(4));
-				} else {
+				} else if (outputMode == RawActivityOutputMode.CSV){
 					out.print(outputBuilder.toString());
+				} else {
+					out.print("Not supported output mode: " + outputModeStr);
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();

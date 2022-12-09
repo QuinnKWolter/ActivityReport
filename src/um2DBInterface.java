@@ -32,7 +32,7 @@ public class um2DBInterface extends dbInterface {
 					// " FROM ent_user U, archive_user_activity UA left join rel_activity_activity RAA on (RAA.ChildActivityId = UA.ActivityId or RAA.ParentActivityId = UA.ActivityId) "
 					+ (queryArchive ? " FROM ent_user U, archive_user_activity UA ": " FROM ent_user U, ent_user_activity UA ")
 					+ " WHERE "
-					+ " GroupId = (select userid from ent_user where login='"
+					+ " GroupId = (select userid from ent_user where isgroup = 1 and login='"
 					+ grp
 					+ "') " + " and U.UserId = UA.UserId ";
 			if (nonStudents != null) {
@@ -51,8 +51,9 @@ public class um2DBInterface extends dbInterface {
 			if (dateRange[1].length() > 0)
 				query += " AND datentime < '" + dateRange[1] + "' ";
 			query += " order by UA.UserId, UA.DateNTime asc;";
-			rs = stmt.executeQuery(query);
 			System.out.println("UM QUERY for getActivity():\n    " + query);
+			rs = stmt.executeQuery(query);
+			
 			// String content_name = "";
 			// ArrayList<String[]> c_c = null;
 			User currentUser = null;
@@ -94,7 +95,13 @@ public class um2DBInterface extends dbInterface {
 				// AllParameters. activityParent does not exist
 				// 37 SALT, 38 parsons, 39 socialreader, 40 educvideos, 41 quizpet, 44 PCRS
 				if (appId == 3 || appId == 25 || appId == 35 || appId == 8 || appId == 23 || appId == 19
-						|| appId == 37 || appId == 38 || appId == 39 || appId == 40 || appId == 41 || appId == 44 || appId == 46 || appId == 47) {
+						|| appId == 37 || appId == 38 || appId == 39 || appId == 40 || appId == 41 || appId == 44 || appId == 46 || appId == 47 || appId == 53) {
+					
+					int codIndex = allParameters.indexOf("cod=");
+					if(codIndex>0) {
+						allParameters = allParameters.substring(0,codIndex);
+					}
+					
 					String[] all_params = allParameters.split(";");
 					if (all_params != null) {
 						for (String _p : all_params) {
@@ -160,6 +167,8 @@ public class um2DBInterface extends dbInterface {
 									case 8: // KT has the activity in the act
 										activityName = value;
 										break;
+									case 53:
+										break;
 									}
 
 								}
@@ -176,6 +185,7 @@ public class um2DBInterface extends dbInterface {
 									case 25: // QUIZJET report the activity in sub
 									case 41: // QUIZ PET
 									case 38: // PARSONS
+									case 53: // DBQA
 									case 44: //PCRS
 										if (activityName.length() == 0) {
 											activityName = value;
@@ -294,9 +304,7 @@ public class um2DBInterface extends dbInterface {
 			return res;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -422,10 +430,15 @@ public class um2DBInterface extends dbInterface {
 			
 			int appId = activityType.equals("ex") ? Common.PCEX_EXAMPLE:Common.PCEX_CHALLENGE;
 			PCEXActivity pcexActivity = pcexActivityTopicMap.get(goalName);
-			LoggedActivity act = new LoggedActivity(appId, sessionId, -1, goalName, activitySetName, goalName, pcexActivity.getFirstTopic(), -1,
-					date.toString(), date.getTime(), trackingId, pcexActivity.getOrderInCourse(), pcexActivity.getTopicOrderInCourse(), -1, "",LogType.PCEX);
+			try {
+				LoggedActivity act = new LoggedActivity(appId, sessionId, -1, goalName, activitySetName, goalName, pcexActivity.getFirstTopic(), -1,
+						date.toString(), date.getTime(), trackingId, pcexActivity.getOrderInCourse(), pcexActivity.getTopicOrderInCourse(), -1, "",LogType.PCEX);
+				currentUser.addLoggedActivity(act);
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
 			
-			currentUser.addLoggedActivity(act);
+			
 		}
 		
 		
@@ -451,9 +464,7 @@ public class um2DBInterface extends dbInterface {
 			return res;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			return null;
 		}
 		finally {
@@ -487,9 +498,7 @@ public class um2DBInterface extends dbInterface {
 			return res;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			return null;
 		}
 		finally {
@@ -524,9 +533,7 @@ public class um2DBInterface extends dbInterface {
 			return res;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -560,9 +567,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -587,9 +592,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -614,9 +617,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -637,9 +638,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -659,9 +658,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -720,9 +717,7 @@ public class um2DBInterface extends dbInterface {
 			return map;
 		}
 		catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
+			ex.printStackTrace();
 			this.releaseStatement(stmt, rs);
 			return null;
 		}
@@ -778,7 +773,7 @@ public class um2DBInterface extends dbInterface {
 		try {
 			HashMap<String, String> res = new HashMap<String, String>();
 			stmt = conn.createStatement();
-			String query = "select ActivityID, Activity from ent_activity where appid in (3, 23, 35, 37,38,44,45,46,47)";
+			String query = "select ActivityID, Activity from ent_activity where appid in (3, 23, 35, 37,38,44,45,46,47,53)";
 			rs = stmt.executeQuery(query);
 			System.out.println("UM QUERY:\n   " + query);
 

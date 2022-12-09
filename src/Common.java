@@ -31,19 +31,14 @@ public class Common {
 	public static final int PCRS	 			= 44;
 	public static final int PCEX_EXAMPLE		= 46;
 	public static final int PCEX_CHALLENGE		= 47;
+	public static final int DBQA				= 53;
 	
 	public static boolean isContent(int appId){
 		return appId == Common.QUIZJET || appId == Common.QUIZPET || appId == Common.PARSONS || appId == Common.QUIZPACK || 
 				appId == Common.SQLKNOT ||appId == Common.SQLTUTOR || appId == Common.WEBEX || appId == Common.ANIMATED_EXAMPLE || 
-				appId == LESSLET || appId == PCRS || appId == PCEX_EXAMPLE || appId == PCEX_CHALLENGE; 
+				appId == LESSLET || appId == PCRS || appId == PCEX_EXAMPLE || appId == PCEX_CHALLENGE || appId == DBQA; 
 				
 	}
-
-	
-
-	public static String progressor_grps = "IS172013Spring,IS172012Fall,IS172012Spring,"
-			+ "IS172011Fall,IS172011Spring,IS172010Fall"; // 6 groups, mapped to
-																										// progressor_plus
 
 	public static String progressor_grps_map = "progressor_plus";
 
@@ -55,7 +50,7 @@ public class Common {
 					"ddicheva","bcaldwell","sibelsomyurek","somyurek","jdg60","demo04","kerttupollari",
 					"yuh43","alto15instructor","johnramirez","regan","sherry","billlaboon","daqing",
 					"rafael.araujo","prmenon","aaltoinstructor","tmprinstructor","dmb72", "test0002","test0003",
-					"experimental_test1","test0001","akhuseyinoglu", "tanja.mitrovic", "cht77", "jiangqiang", "ykortsarts"));
+					"experimental_test1","test0001","akhuseyinoglu", "tanja.mitrovic", "cht77", "jiangqiang", "ykortsarts","mab650"));
 
 	
 	
@@ -85,6 +80,7 @@ public class Common {
 		APP_MAP.put(44, "PCRS");
 		APP_MAP.put(46, "PCEX_EXAMPLE");
 		APP_MAP.put(47, "PCEX_CHALLENGE");
+		APP_MAP.put(53, "DBQA");
 		APP_MAP.put(-1, "MASTERY_GRIDS");
 	}
 	public static HashMap<String, Integer> MG_ACTIVITYID_MAP;

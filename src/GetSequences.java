@@ -170,13 +170,8 @@ public class GetSequences extends HttpServlet {
 			
 			for (String group : groupIds) {
 				System.out.println("GROUP:"+group);
-				String topicSource = "UNKNOWN";
-				if (Common.mg_grps.contains(group))
-					topicSource = "MG";
-				else if (Common.progressor_grps.contains(group))
-					topicSource = "PR";
-
-				GroupActivity groupActivity = new GroupActivity(group, topicSource,
+				
+				GroupActivity groupActivity = new GroupActivity(group,
 						non_students, Common.non_sessions, false, cm, dateRange, queryArchive);
 				
 				// @@@@

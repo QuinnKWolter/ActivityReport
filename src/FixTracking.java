@@ -107,6 +107,9 @@ public class FixTracking extends HttpServlet {
 			case 38: // parsons
 				activityid = activities.get(row[7]);
 				break;
+			case 53: // parsons
+				activityid = activities.get(row[7]);
+				break;
 			default:
 				break;
 				

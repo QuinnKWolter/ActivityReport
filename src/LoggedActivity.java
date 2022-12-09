@@ -98,6 +98,12 @@ public class LoggedActivity implements Comparable<LoggedActivity> {
 	
 	public void processAllParameters() {
 		this.params = new HashMap<String,String>();
+		
+		int codIndex = allParameters.indexOf("cod=");
+		if(codIndex>0) {
+			allParameters = allParameters.substring(0,codIndex);
+		}
+		
 		String[] paramPairs = allParameters.split(",");
 		for (String param : paramPairs) {
 			String[] pair = param.split(":");

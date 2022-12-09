@@ -105,16 +105,10 @@ public class ActivitySummary extends HttpServlet {
 			
 			for(String groupId:groupIds) {
 				
-				String topicSource = "UNKNOWN";
-				if (Common.mg_grps.contains(groupId))
-					topicSource = "MG";
-				else if (Common.progressor_grps.contains(groupId))
-					topicSource = "PR";
-
 				// ---------------------------------------------------------------------------
 				// This is the main objects, and where the main computations are made
 				// ---------------------------------------------------------------------------
-				GroupActivity groupActivity = new GroupActivity(groupId, topicSource,
+				GroupActivity groupActivity = new GroupActivity(groupId,
 						non_students, Common.non_sessions, true, cm, dateRange, queryArchive, sessionate, minThreshold, timeBins);
 				
 				String delimiter = cm.delimiter;
@@ -168,6 +162,9 @@ public class ActivitySummary extends HttpServlet {
 					
 					outputBuilder.append("sqltutor_attempts" + delimiter + "sqltutor_attempts_success" 
 							+ delimiter + "sqltutor_dist" + delimiter + "sqltutor_dist_success" + delimiter);
+					
+					outputBuilder.append("dbqa_steps" + delimiter + "dbqa_final_steps" 
+							+ delimiter + "dbqa_dist" + delimiter + "dbqa_dist_completed" + delimiter);
 					
 					outputBuilder.append("pcex_completed_set" + delimiter + "pcex_ex_dist_seen" + delimiter + "pcex_ch_attempts" + delimiter + "pcex_ch_attempts_success" 
 							+ delimiter + "pcex_ch_dist" + delimiter + "pcex_ch_success" 
@@ -227,6 +224,7 @@ public class ActivitySummary extends HttpServlet {
 							+ "pcrs_durationseconds_second_attempt" + delimiter
 							+ "pcrs_durationseconds_third_attempt" + delimiter
 							+ "sqltutor_durationseconds" + delimiter
+							+ "dbqa_durationseconds" + delimiter
 							+ "pcex_example_durationseconds" + delimiter
 							+ "pcex_example_durationseconds_median" + delimiter
 							+ "pcex_example_lines_durationseconds" + delimiter
@@ -380,6 +378,10 @@ public class ActivitySummary extends HttpServlet {
 									+ user.summary.get("sqltutor_attempts_success") + delimiter
 									+ user.summary.get("sqltutor_dist") + delimiter
 									+ user.summary.get("sqltutor_dist_success") + delimiter
+									+ user.summary.get("dbqa_steps") + delimiter
+									+ user.summary.get("dbqa_final_steps") + delimiter
+									+ user.summary.get("dbqa_dist") + delimiter
+									+ user.summary.get("dbqa_dist_completed") + delimiter
 									+ user.summary.get("pcex_completed_set") + delimiter
 									+ user.summary.get("pcex_ex_dist_seen") + delimiter
 									+ user.summary.get("pcex_ch_attempts") + delimiter
@@ -449,6 +451,7 @@ public class ActivitySummary extends HttpServlet {
 									+ user.summary.get("durationseconds_pcrs_second_attempt") + delimiter
 									+ user.summary.get("durationseconds_pcrs_third_attempt") + delimiter
 									+ user.summary.get("durationseconds_sqltutor") + delimiter
+									+ user.summary.get("durationseconds_dbqa") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex_median") + delimiter
 									+ user.summary.get("durationseconds_pcex_ex_lines") + delimiter

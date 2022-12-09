@@ -24,7 +24,7 @@ public class dbInterface {
 		try{
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			System.out.println(dbstring+"?"+ "user="+dbuser+"&password="+dbpass);
-			conn = DriverManager.getConnection(dbstring+"?"+ "user="+dbuser+"&password="+dbpass);
+			conn = DriverManager.getConnection(dbstring+"?"+ "user="+dbuser+"&password="+dbpass+"&useSSL=false");
 		
 		}catch (Exception ex) {
 			ex.printStackTrace();

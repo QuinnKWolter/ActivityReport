@@ -69,6 +69,12 @@ public class GroupActivity {
 			boolean getSummary, ConfigManager cm, String[] dateRange, boolean queryArchive){
 		this(grp, non_students, non_sessions, getSummary, cm, dateRange, queryArchive, false, 0, null);
 	}
+	
+	public GroupActivity(String grp, RawActivityRequestParameters params, ConfigManager cm, long timeBins[]) {
+		this(grp, params.non_students, Common.non_sessions, false, cm, params.dateRanges, 
+				params.queryArchive, params.sessionate, params.minThreshold, timeBins);
+	}
+	
 	public GroupActivity(String grp,
 			ArrayList<String> non_students, ArrayList<String> non_sessions,
 			boolean getSummary, ConfigManager cm, String[] dateRange, boolean queryArchive,

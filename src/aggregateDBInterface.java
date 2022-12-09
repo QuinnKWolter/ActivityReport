@@ -183,7 +183,7 @@ public class aggregateDBInterface extends dbInterface {
 					+ " (SELECT A1.activity AS set_name, A2.activity AS act_name, A2.AppID FROM um2.ent_activity A1, um2.ent_activity A2,um2.rel_pcex_set_component AA1 "
 					+ "WHERE A1.AppID = 45 AND (A2.AppID = 46 OR A2.AppID = 47) AND AA1.ParentActivityID = A1.ActivityID AND AA1.ChildActivityID = A2.ActivityID) as pcex_activity"
 					+ "  where G.group_id = '"+ grp+ "' and T.course_id = G.course_id "
-					+ "  and TC.content_id = C.content_id and TC.topic_id = T.topic_id  AND pcex_activity.set_name = C.content_name order by T.order, TC.resource_id, TC.display_order";
+					+ "  and TC.content_id = C.content_id and TC.topic_id = T.topic_id  AND (pcex_activity.set_name = C.content_name OR pcex_activity.act_name = C.content_name) order by T.order, TC.resource_id, TC.display_order";
 			rs = stmt.executeQuery(query);
 			
 			

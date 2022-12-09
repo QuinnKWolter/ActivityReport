@@ -538,6 +538,8 @@ public class User {
 		Set<String> success_pcrs = new HashSet<String>();
 		Set<String> sqltutor = new HashSet<String>();
 		Set<String> success_sqltutor = new HashSet<String>();
+		Set<String> dbqa = new HashSet<String>();
+		Set<String> completed_dbqa = new HashSet<String>();
 		Map<Integer,AtomicInteger> pcrsCorrectAttemptMap = new HashMap<Integer, AtomicInteger>();
 		Set<String> pcex_ex = new HashSet<String>();
 		Set<String> pcex_ch = new HashSet<String>();
@@ -561,6 +563,7 @@ public class User {
 		time_summary.put("pcrs_second_attempt", 0.0);
 		time_summary.put("pcrs_third_attempt", 0.0);
 		time_summary.put("sqltutor", 0.0);
+		time_summary.put("dbqa", 0.0);
 		time_summary.put("pcex_ex", 0.0);
 		time_summary.put("pcex_ex_lines", 0.0);
 		time_summary.put("pcex_ch", 0.0);
@@ -609,6 +612,8 @@ public class User {
 		long pcex_completed_set = pcexChallengeCompletionMap.values().stream().filter(PCEXChallengeSetProgress::isSetCompleted).distinct().count();
 		int example_lines = 0;
 		int animated_example_lines = 0;
+		int dbqa_steps = 0;
+		int dbqa_final_steps = 0;
 		int sql_knot_attempts = 0;
 		int sql_lab_attempts = 0;
 		Map<Integer,AtomicInteger> sqlKnotCorrectAttemptMap = new HashMap<Integer, AtomicInteger>();
@@ -897,6 +902,15 @@ public class User {
 				sessionActivity.addAnimation(a.getParentName());
 				
 				topics.add(a.getTopicName()); //Just for previous year SQL courses
+			} else if(a.getAppId() == Common.DBQA){
+				dbqa.add(a.getParentName());
+				time_summary.put("dbqa",time_summary.get("dbqa") + a.getTime());
+				dbqa_steps++;
+				if (a.getResult() == 1) {
+					completed_dbqa.add(a.getParentName());
+					dbqa_final_steps++;
+				}
+				sessionActivity.addQuestion(a.getParentName());
 			}
 			else if (a.getAppId() == Common.MASTERY_GRIDS) {//MASTERY_GRIDS
 				time_summary.put("mastery_grid",time_summary.get("mastery_grid") + a.getTime());
@@ -1087,6 +1101,11 @@ public class User {
 		summary.put("sqltutor_dist",  (double) sqltutor.size());
 		summary.put("sqltutor_dist_success",  (double) success_sqltutor.size());
 		
+		summary.put("dbqa_steps",  (double) dbqa_steps);
+		summary.put("dbqa_final_steps",  (double) dbqa_final_steps);
+		summary.put("dbqa_dist",  (double) dbqa.size());
+		summary.put("dbqa_dist_completed",  (double) completed_dbqa.size());
+		
 		summary.put("pcex_completed_set", (double) pcex_completed_set);
 		summary.put("pcex_ex_dist_seen", (double) pcex_ex.size());
 		summary.put("pcex_ch_attempts",  (double) pcex_ch_attempts);
@@ -1124,6 +1143,7 @@ public class User {
 		summary.put("durationseconds_pcrs_second_attempt", time_summary.get("pcrs_second_attempt"));
 		summary.put("durationseconds_pcrs_third_attempt", time_summary.get("pcrs_third_attempt"));
 		summary.put("durationseconds_sqltutor", time_summary.get("sqltutor"));
+		summary.put("durationseconds_dbqa", time_summary.get("dbqa"));
 		summary.put("durationseconds_pcex_ex", time_summary.get("pcex_ex"));
 		summary.put("durationseconds_pcex_ex_median", exampleMedian);
 		summary.put("durationseconds_pcex_ex_lines", time_summary.get("pcex_ex_lines"));

@@ -85,3 +85,4 @@ local.properties
 .scala_dependencies
 .workshee
 WebContent/WEB-INF/web.xml
+class_backup/

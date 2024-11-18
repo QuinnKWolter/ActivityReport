@@ -96,18 +96,18 @@ public class FixTracking extends HttpServlet {
 			case 23: // SQLKnot
 			case 32: // progressor
 			case 35:	
+			case 46: // PCEX
 				activityid = actSubIds.get(row[6]+"_"+row[7]);
 				break;
 			case 8: // ktree
 				activityid = activities.get(row[6]);
 				break;
 			case 25:
-				activityid = activities.get(row[7]);
-				break;
 			case 38: // parsons
-				activityid = activities.get(row[7]);
-				break;
-			case 53: // parsons
+			case 41:
+			case 44:
+			case 47: // PCEX-Challenges
+			case 53:
 				activityid = activities.get(row[7]);
 				break;
 			default:

@@ -707,7 +707,7 @@ public class um2DBInterface extends dbInterface {
 			String query = " select A.activityid as activityid, A.activity as act, A2.activity as `sub` , A2.activityid as subid	"
 					+ "from ent_activity A, rel_activity_activity AA, ent_activity A2 "
 					+ "where A.activityid = AA.ParentActivityID  and A2.activityid = AA.ChildActivityID "
-					+ "and AA.AppID in (3,6,9,23,32,35) order by A.activityid, `sub` asc";
+					+ "and AA.AppID in (3,6,9,23,32,35,46) order by A.activityid, `sub` asc";
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				map.put(rs.getString("act") + "_" + rs.getString("sub"),

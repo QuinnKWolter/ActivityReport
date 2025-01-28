@@ -96,6 +96,11 @@ This service generate a file with SQL update scripts for correcting bad tracked 
 
 * **archive** (optional): If provided, SQL update scripts are generated for the archive table.  
 
+
+## New Service Troubleshooting Tips
+New Service Documentation available [here](https://docs.google.com/document/d/1F8J2yNzgDd0eslWrQvRHRf5vq4IsDl-4LWKxuIUkqeI/edit?tab=t.0)
+
+
 ## Old Service Descriptions
 
 The old service description is available at <https://docs.google.com/document/d/12UfF9YE0zQtoxniRKohiOotuuhXcp9zAYLZ51-Ia1eI>  

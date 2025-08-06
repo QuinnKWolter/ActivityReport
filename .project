@@ -26,8 +26,10 @@
 		<nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<!-- Arun: 08 06 2025 Added by Eclipse 2022-03 (4.23.0) automatically-->
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
+	<!-- Arun: 08 06 2025 Added by Eclipse 2022-03 (4.23.0) automatically-->
 	<filteredResources>
 		<filter>
 			<id>1745240044589</id>

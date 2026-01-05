@@ -1,7 +1,7 @@
 import { LoggedActivity } from '../models/LoggedActivity';
 import { User } from '../models/User';
 import { RawActivityParams } from '../services/RawActivityService';
-import { formatDecimal, replaceNewLines } from '../common';
+import { formatDecimal, escapeCsvField } from '../common';
 
 export class CsvOutputFormatter {
   private delimiter: string;
@@ -62,7 +62,9 @@ export class CsvOutputFormatter {
       values.push(act.svc || '');
     }
     if (params.includeAllParameters) {
-      values.push(`"${replaceNewLines(act.allParameters)}"`);
+      // AllParameters can contain arbitrary code dumps with quotes, newlines, etc.
+      // Properly escape it for CSV format
+      values.push(`"${escapeCsvField(act.allParameters)}"`);
     }
 
     return values.join(this.delimiter) + '\n';

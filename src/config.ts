@@ -25,55 +25,106 @@ export interface AppConfig {
 }
 
 export function loadConfig(): AppConfig {
-  // Check if SSH tunneling is needed
-  const useSSH = process.env.SSH_HOST !== undefined;
+  // Check if using new single-database pattern (DB_HOST, DB_USER, etc.)
+  const useSingleDB = process.env.DB_HOST !== undefined || process.env.DB_USER !== undefined;
+  
+  // SSH configuration - check USE_SSH flag or SSH_HOST presence
+  const useSSH = process.env.USE_SSH === 'True' || process.env.USE_SSH === 'true' || 
+                 (process.env.SSH_HOST !== undefined && !useSingleDB);
   const sshHost = process.env.SSH_HOST;
   const sshUser = process.env.SSH_USER;
   const sshPassword = process.env.SSH_PASSWORD;
   const sshPort = parseInt(process.env.SSH_PORT || '22', 10);
 
-  const config = {
-    um2: {
-      host: useSSH ? '127.0.0.1' : (process.env.UM2_DB_HOST || 'localhost'),
-      port: parseInt(process.env.UM2_DB_PORT || '3306', 10),
-      user: process.env.UM2_DB_USER || 'root',
-      password: process.env.UM2_DB_PASSWORD || '',
-      database: process.env.UM2_DB_NAME || 'um2',
-      ...(useSSH && sshHost && sshUser ? {
-        ssh: {
-          host: sshHost,
-          username: sshUser,
-          password: sshPassword,
-          port: sshPort,
+  let config: AppConfig;
+
+  if (useSingleDB) {
+    // New pattern: Single database connection with different schemas
+    const dbHost = process.env.DB_HOST || 'localhost';
+    const dbPort = parseInt(process.env.DB_PORT || '3306', 10);
+    const dbUser = process.env.DB_USER || 'root';
+    const dbPassword = process.env.DB_PASSWORD || '';
+    const um2Schema = process.env.UM2_DB_SCHEMA || 'um2';
+    const aggregateSchema = process.env.AGGREGATE_DB_SCHEMA || 'aggregate';
+
+    const sshConfig = (useSSH && sshHost && sshUser) ? {
+      host: sshHost,
+      username: sshUser,
+      password: sshPassword,
+      port: sshPort,
+    } : undefined;
+
+    config = {
+      um2: {
+        host: useSSH ? '127.0.0.1' : dbHost,
+        port: dbPort,
+        user: dbUser,
+        password: dbPassword,
+        database: um2Schema,
+        ...(sshConfig ? { ssh: sshConfig } : {}),
+      },
+      aggregate: {
+        host: useSSH ? '127.0.0.1' : dbHost,
+        port: dbPort,
+        user: dbUser,
+        password: dbPassword,
+        database: aggregateSchema,
+        ...(sshConfig ? { ssh: sshConfig } : {}),
+      },
+      port: (() => {
+        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+        if (isNaN(port) || port < 1024 || port > 65535) {
+          console.warn(`Invalid PORT value: ${process.env.PORT}, defaulting to 3000`);
+          return 3000;
         }
-      } : {}),
-    },
-    aggregate: {
-      host: useSSH ? '127.0.0.1' : (process.env.AGGREGATE_DB_HOST || 'localhost'),
-      port: parseInt(process.env.AGGREGATE_DB_PORT || '3306', 10),
-      user: process.env.AGGREGATE_DB_USER || 'root',
-      password: process.env.AGGREGATE_DB_PASSWORD || '',
-      database: process.env.AGGREGATE_DB_NAME || 'aggregate',
-      ...(useSSH && sshHost && sshUser ? {
-        ssh: {
-          host: sshHost,
-          username: sshUser,
-          password: sshPassword,
-          port: sshPort,
+        return port;
+      })(),
+      delimiter: process.env.DELIMITER || ',',
+    };
+  } else {
+    // Legacy pattern: Separate database configurations
+    config = {
+      um2: {
+        host: useSSH ? '127.0.0.1' : (process.env.UM2_DB_HOST || 'localhost'),
+        port: parseInt(process.env.UM2_DB_PORT || '3306', 10),
+        user: process.env.UM2_DB_USER || 'root',
+        password: process.env.UM2_DB_PASSWORD || '',
+        database: process.env.UM2_DB_NAME || 'um2',
+        ...(useSSH && sshHost && sshUser ? {
+          ssh: {
+            host: sshHost,
+            username: sshUser,
+            password: sshPassword,
+            port: sshPort,
+          }
+        } : {}),
+      },
+      aggregate: {
+        host: useSSH ? '127.0.0.1' : (process.env.AGGREGATE_DB_HOST || 'localhost'),
+        port: parseInt(process.env.AGGREGATE_DB_PORT || '3306', 10),
+        user: process.env.AGGREGATE_DB_USER || 'root',
+        password: process.env.AGGREGATE_DB_PASSWORD || '',
+        database: process.env.AGGREGATE_DB_NAME || 'aggregate',
+        ...(useSSH && sshHost && sshUser ? {
+          ssh: {
+            host: sshHost,
+            username: sshUser,
+            password: sshPassword,
+            port: sshPort,
+          }
+        } : {}),
+      },
+      port: (() => {
+        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+        if (isNaN(port) || port < 1024 || port > 65535) {
+          console.warn(`Invalid PORT value: ${process.env.PORT}, defaulting to 3000`);
+          return 3000;
         }
-      } : {}),
-    },
-    port: (() => {
-      const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-      // Ensure port is valid and not a database port
-      if (isNaN(port) || port < 1024 || port > 65535) {
-        console.warn(`Invalid PORT value: ${process.env.PORT}, defaulting to 3000`);
-        return 3000;
-      }
-      return port;
-    })(),
-    delimiter: process.env.DELIMITER || ',',
-  };
+        return port;
+      })(),
+      delimiter: process.env.DELIMITER || ',',
+    };
+  }
 
   // Validate server port (shouldn't be a database port)
   if (config.port === 3306 || config.port === config.um2.port || config.port === config.aggregate.port) {
@@ -98,10 +149,12 @@ export function loadConfig(): AppConfig {
   console.log(`  Server Port: ${config.port}`);
 
   // Check if .env file exists
-  if (!process.env.UM2_DB_USER && !process.env.AGGREGATE_DB_USER) {
-    console.warn('\n⚠️  WARNING: No .env file found or environment variables not set!');
-    console.warn('   Please create a .env file with your database credentials.');
-    console.warn('   See .env.example for reference.\n');
+  if (!useSingleDB && !process.env.UM2_DB_USER && !process.env.AGGREGATE_DB_USER) {
+    if (!process.env.DB_USER) {
+      console.warn('\n⚠️  WARNING: No .env file found or environment variables not set!');
+      console.warn('   Please create a .env file with your database credentials.');
+      console.warn('   See .env.example for reference.\n');
+    }
   }
 
   return config;

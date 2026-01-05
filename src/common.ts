@@ -106,6 +106,23 @@ export function compareStringDates(date1: string, date2: string): number {
 }
 
 export function replaceNewLines(s: string): string {
-  return s.replace(/\n/g, '\\n');
+  if (!s) return '';
+  // Replace newlines and carriage returns
+  return s.replace(/\r\n/g, '\\n').replace(/\n/g, '\\n').replace(/\r/g, '\\n');
+}
+
+/**
+ * Escapes CSV field content, especially for AllParameters which can contain
+ * arbitrary code dumps with quotes, newlines, and special characters
+ */
+export function escapeCsvField(s: string): string {
+  if (!s) return '';
+  // Replace quotes with double quotes (CSV escaping)
+  // Replace newlines and carriage returns
+  let escaped = s.replace(/"/g, '""'); // Escape quotes
+  escaped = escaped.replace(/\r\n/g, ' ').replace(/\n/g, ' ').replace(/\r/g, ' ');
+  // Replace tabs with spaces to avoid breaking CSV structure
+  escaped = escaped.replace(/\t/g, ' ');
+  return escaped;
 }
 

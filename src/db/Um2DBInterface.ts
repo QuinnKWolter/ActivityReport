@@ -34,13 +34,13 @@ export class Um2DBInterface extends DatabaseInterface {
       const table = queryArchive ? 'archive_user_activity' : 'ent_user_activity';
       let query = `
         SELECT 
-          UA.AppId, UA.UserId, U.Login, UA.ActivityId, UA.Result, UA.\`Session\`, 
+          UA.AppID, UA.UserID, U.Login, UA.ActivityID, UA.Result, UA.\`Session\`, 
           UA.DateNTime, UA.DateNTimeNS, UNIX_TIMESTAMP(UA.DateNTime) as utimestamp, 
           UA.SVC, UA.AllParameters 
         FROM ent_user U, ${table} UA 
         WHERE 
-          GroupId = (SELECT userId FROM ent_user WHERE isgroup = 1 AND login = ?)
-          AND U.UserId = UA.UserId
+          UA.GroupID = (SELECT UserID FROM ent_user WHERE IsGroup = 1 AND Login = ?)
+          AND U.UserID = UA.UserID
       `;
 
       const params: any[] = [grp];
@@ -53,7 +53,7 @@ export class Um2DBInterface extends DatabaseInterface {
         query += ` AND UA.\`Session\` NOT IN (${nonSessionsStr})`;
       }
       query += ` AND UA.\`Session\` NOT LIKE '%TEST%' AND UA.\`Session\` NOT LIKE '%test%'`;
-      query += ` AND UA.UserId NOT IN (SELECT userId FROM rel_user_user WHERE GroupId = 68)`;
+      query += ` AND UA.UserID NOT IN (SELECT UserID FROM rel_user_user WHERE GroupID = 68)`;
       query += ` AND UA.AllParameters NOT LIKE '%usr=undefined%' AND UA.AllParameters NOT LIKE '%sid=undefined%'`;
 
       if (dateRange[0] && dateRange[0].length > 0) {
@@ -64,7 +64,7 @@ export class Um2DBInterface extends DatabaseInterface {
         query += ` AND datentime < ?`;
         params.push(dateRange[1]);
       }
-      query += ` ORDER BY UA.UserId, UA.DateNTime ASC`;
+      query += ` ORDER BY UA.UserID, UA.DateNTime ASC`;
 
       console.log('UM QUERY for getActivity():\n    ', query);
       const [rows] = await connection.execute(query, params) as any[];
@@ -74,7 +74,7 @@ export class Um2DBInterface extends DatabaseInterface {
 
       for (const row of rows) {
         count++;
-        const userId = row.UserId;
+        const userId = row.UserID;
         const login = row.Login;
         const utimestamp = row.utimestamp;
 
@@ -86,7 +86,7 @@ export class Um2DBInterface extends DatabaseInterface {
           currentUser = new User(userId, login);
         }
 
-        const appId = row.AppId;
+        const appId = row.AppID;
         let allParameters = row.AllParameters || '';
         let activityName = '';
         let parentName = '';
@@ -208,7 +208,7 @@ export class Um2DBInterface extends DatabaseInterface {
         const act = new LoggedActivity(
           appId,
           row.Session || 'NULL',
-          row.ActivityId || -1,
+          row.ActivityID || -1,
           activityName,
           '',
           parentName,
@@ -244,11 +244,12 @@ export class Um2DBInterface extends DatabaseInterface {
   async getActivityName(): Promise<Map<string, string>> {
     const connection = await this.getConnection();
     try {
-      const query = 'SELECT Activity, ActivityName FROM ent_activity';
+      const query = 'SELECT ActivityID, Activity FROM ent_activity WHERE AppID IN (3, 23, 35, 37, 38, 44, 45, 46, 47, 53)';
       const [rows] = await connection.execute(query) as any[];
+      console.log('UM QUERY:\n   ', query);
       const map = new Map<string, string>();
       for (const row of rows) {
-        map.set(row.Activity, row.ActivityName);
+        map.set(row.ActivityID.toString(), row.Activity);
       }
       return map;
     } finally {
@@ -272,28 +273,19 @@ export class Um2DBInterface extends DatabaseInterface {
   }
 
   async getActSubIdMap(): Promise<Map<string, number>> {
-    const connection = await this.getConnection();
-    try {
-      const query = 'SELECT Activity, SubActivity, ActSubID FROM ent_act_sub';
-      const [rows] = await connection.execute(query) as any[];
-      const map = new Map<string, number>();
-      for (const row of rows) {
-        map.set(`${row.Activity}_${row.SubActivity}`, row.ActSubID);
-      }
-      return map;
-    } finally {
-      this.releaseConnection(connection);
-    }
+    // Note: ent_act_sub table does not exist in the current schema
+    // This method is kept for compatibility but returns empty map
+    return new Map<string, number>();
   }
 
   async getLoginUserIdMap(): Promise<Map<string, number>> {
     const connection = await this.getConnection();
     try {
-      const query = 'SELECT Login, UserId, GroupId FROM ent_user WHERE isgroup = 0';
+      const query = 'SELECT Login, UserID, GroupID FROM ent_user WHERE IsGroup = 0';
       const [rows] = await connection.execute(query) as any[];
       const map = new Map<string, number>();
       for (const row of rows) {
-        map.set(row.Login, row.GroupId);
+        map.set(row.Login, row.GroupID);
       }
       return map;
     } finally {
@@ -308,7 +300,7 @@ export class Um2DBInterface extends DatabaseInterface {
       const query = `
         SELECT DateNTime, DateNTimeNS, AllParameters, id 
         FROM ${table} 
-        WHERE appid = 1 AND activityid = 1 AND groupid = 1 AND userid = 2
+        WHERE AppID = 1 AND ActivityID = 1 AND GroupID = 1 AND UserID = 2
       `;
       const [rows] = await connection.execute(query) as any[];
       return rows.map((row: any) => [

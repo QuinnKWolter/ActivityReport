@@ -84,6 +84,11 @@ export class GroupActivityService {
         user.computeActivityTimes();
         user.computeAttemptNo();
         // PCEX set completion rate computation would go here
+        
+        // Compute summary if requested
+        if (getSummary) {
+          user.getSummary(timeBins);
+        }
       }
 
       return grpActivity;
